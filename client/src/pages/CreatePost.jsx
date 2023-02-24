@@ -10,7 +10,30 @@ const CreatePost = () => {
   const [generatingImg, setGenerationImg] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const generateImage = () => {};
+  const generateImage = async () => {
+    if (form.prompt) {
+      try {
+        setGenerationImg(true);
+        const response = await fetch("http://localhost:5000/api/v1/aiImg", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt: form.prompt }),
+        });
+
+        const data = await response.json();
+
+        setForm({ ...form, photo: `data:image/jpeg;base64,${data.photo}` });
+      } catch (error) {
+        alert(error);
+      } finally {
+        setGenerationImg(false);
+      }
+    } else {
+      alert("Please enter a prompt");
+    }
+  };
   const handleSubmit = () => {};
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.vlaue });
@@ -32,19 +55,19 @@ const CreatePost = () => {
       <form className=" mt-16 max-w-3xl" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-5">
           <FormField
-            lableName="Your Name"
+            labelName="Your Name"
             type="text"
             name="name"
-            placeholder="kavin"
-            vlaue={form.name}
+            placeholder="Ex., kavi gasyal"
+            value={form.name}
             handleChange={handleChange}
           />
           <FormField
-            lableName="Prompt"
+            labelName="Prompt"
             type="text"
             name="prompt"
-            placeholder={form.prompt}
-            vlaue={form.prompt}
+            placeholder="An Impressionist oil painting of sunflowers in a purple vase…"
+            value={form.prompt}
             handleChange={handleChange}
             isSurpriseMe
             handleSurpriseMe={handleSurpriseMe}
